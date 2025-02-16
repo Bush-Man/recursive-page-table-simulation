@@ -1,10 +1,11 @@
 # Features
 
-1. [ ] Memory Allocator - To allocate and manage free memory blocks.
-2. [ ] Physical Memory  - Simulate computers physical memory for storing programs data when it is running.
-3. [ ] Virtual Address Generator - To create virtual addresses that a program will use to access physical memory.
-4. [ ] PageTable and PageTableEntry - Store information about the mappings between virtual address and physcal memory frames.
+1. [X] Memory Allocator - To allocate and manage free memory blocks.
+2. [X] Physical Memory - Simulate computers physical memory for storing programs data when it is running.
+3. [X] Virtual Address Generator - To create virtual addresses that a program will use to access physical memory.
+4. [X] PageTable and PageTableEntry - Store information about the mappings between virtual address and physcal memory frames.
 5. [ ] Create a process - Simulate a program
+6. [ ] Recursive Paging - Accessing page tables using a recursive entry.
 
 # **Bugs**
 
