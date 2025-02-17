@@ -3,11 +3,12 @@ use std::collections::HashMap;
 use bit_field::BitField;
 use rand::Rng;
 
-const PAGE_SIZE:usize = 4096;
+const PAGE_SIZE:usize = 4096; // PAGE_ENTRY_SIZE * PAGE_TABLE_ENTRIES
 const PAGE_TABLE_ENTRIES:usize = 512;
 const USER_SPACE_START_ADDRESS:usize = 0x0000_0000_0000_0000;
 const USER_SPACE_END_ADDRESS:usize = 0x0000_7FFF_FFFF_FFFF;
 const RECURSIVE_ENTRY : usize = 511;
+const PAGE_ENTRY_SIZE: usize = 8;  //8 bytes
 
 
 #[repr(transparent)]
@@ -142,22 +143,59 @@ fn virt_addr_indices(virt_addr:u64)->(usize,usize,usize,usize){
 
     (pml4_idx,pdpt_idx,pdt_idx,pt_idx)
 }
-fn map_virtual_to_physical_address(virt_addr:u64,phys_mem:&PhysicalMemory,frame_allocator:&FrameAllocator)->u64{
+
+fn pml4_virtual_access_addr( pml4_idx: usize)->usize{
+     (RECURSIVE_ENTRY << 39) | (RECURSIVE_ENTRY << 30) | (RECURSIVE_ENTRY << 21) | (RECURSIVE_ENTRY << 12)| (pml4_idx * PAGE_ENTRY_SIZE)
+
+}
+
+fn pdtp_virtual_access_addr(pml4_idx: usize,pdpt_idx:usize)->usize{
+    (RECURSIVE_ENTRY << 39)| (RECURSIVE_ENTRY << 30) | (RECURSIVE_ENTRY << 21) | ( pml4_idx << 12) | (pdpt_idx * PAGE_ENTRY_SIZE)
+}
+
+fn pdt_virtual_access_addr(pml4_idx: usize,pdpt_idx:usize,pdt_idx:usize)->usize{
+    (RECURSIVE_ENTRY << 39) | (RECURSIVE_ENTRY << 30)| (pml4_idx << 21) | (pdpt_idx << 12) | (pdt_idx * PAGE_ENTRY_SIZE)
+}
+
+fn pt_virtual_access_addr(pml4_idx: usize,pdpt_idx:usize,pdt_idx:usize,pt_idx:usize)->usize{
+    (RECURSIVE_ENTRY << 39) | (pml4_idx << 30) | (pdpt_idx << 21)| (pdt_idx << 12)|(pt_idx * PAGE_ENTRY_SIZE)
+
+}
+
+// translate virtual to physical address using the recurisive entry
+fn translate_virtual_to_physical_address(virt_addr:u64,phys_mem:&PhysicalMemory,frame_allocator:&FrameAllocator)->u64{
     // break down virtual address to indices into PML4, PDTP, PDT,PT
     let (pml4_idx,pdpt_idx,pdt_idx,pt_idx) = virt_addr_indices(virt_addr);
+
+    // create virtual addresses to access page tables using the indices
+    let pml4_entry_address = pml4_virtual_access_addr(pml4_idx);
+
+
+
 
 
     // if a page table is not created create it 
     // save page table in memory
     // return the physical address of the virtual address
 }
- fn set_up_recursive_entry()
+
 
 fn main(){
     // initalize memory and frame allocator
+
+  let  frame_allocator = FrameAllocator::new(1,10);
+  let physicalMemory = PhysicalMemory::new();
   
 
     println!("{:?}","working");
 
 
 }
+/*
+ virtual address:h
+      1. extract indixes into page tables - index gives the entry we want
+      2. In recursive paging construct an address of the table address of the table we want to access using the recursive entry, 
+      but if traversing using the indices we will use the there is no need to construct the address
+      3.    
+     
+*/
